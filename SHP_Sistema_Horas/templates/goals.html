@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Metas semestrales · SHP{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">PLANIFICACIÓN · ENTRADA</div><h1>Mis metas semestrales</h1><p>Define cuántas horas deseas completar por categoría y periodo.</p></div></div>
+<div class="two-column-layout">
+  <form method="post" class="form-panel compact-panel">
+    <div class="form-section-title"><span>＋</span><div><h2>Configurar meta</h2><p>Puedes actualizar una meta existente.</p></div></div>
+    <label class="form-label">Categoría *</label><select name="category" class="form-select mb-3" required><option value="">Selecciona categoría</option>{% for c in categories %}<option>{{ c['category'] }}</option>{% endfor %}</select>
+    <label class="form-label">Horas objetivo *</label><div class="input-group mb-3"><input class="form-control" type="number" min="0.5" step="0.5" name="target_hours" placeholder="Ej. 20" required><span class="input-group-text">horas</span></div>
+    <label class="form-label">Periodo académico *</label><input class="form-control mb-4" name="period" value="{{ period }}" placeholder="2026-I o 2026-II" pattern="[0-9]{4}-(I|II)" required>
+    <button class="btn btn-primary w-100">Guardar meta</button>
+  </form>
+  <div class="form-panel compact-panel"><div class="form-section-title"><span>◎</span><div><h2>Metas guardadas</h2><p>Objetivos definidos por periodo.</p></div></div>
+    {% for goal in goals %}<div class="goal-row"><div><b>{{ goal['category'] }}</b><small>{{ goal['period'] }}</small></div><strong>{{ goal['target_hours'] }} h</strong></div>{% else %}<div class="empty-state small-empty"><div class="empty-icon">◎</div><h3>No hay metas todavía</h3><p>Agrega una meta usando el formulario.</p></div>{% endfor %}
+  </div>
+</div>
+{% endblock %}

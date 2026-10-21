@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Acceso · SHP{% endblock %}
+{% block public_content %}
+<div class="login-page">
+  <div class="login-decoration"></div>
+  <div class="login-card">
+    <div class="login-logo">S</div>
+    <div class="eyebrow text-center">UNIVERSIDAD AMERICANA · UAM</div>
+    <h1>Bienvenido al <span>SHP</span></h1>
+    <p class="text-secondary text-center mb-4">Sistema de Horas Personales</p>
+    <div class="demo-alert"><b>Acceso institucional</b><br>Solo se aceptan correos terminados en <strong>@uamv.edu.ni</strong>. Este formulario sigue en modo demostración: validar el dominio no confirma que seas propietario del correo.</div>
+    <form method="post" class="mt-4">
+      <label class="form-label">Nombre completo</label><input class="form-control form-control-lg" name="name" placeholder="Ej. Maykel Cruz" required>
+      <label class="form-label mt-3">Correo institucional</label><input class="form-control form-control-lg" type="email" name="email" placeholder="usuario@uamv.edu.ni" pattern=".+@uamv\.edu\.ni" title="Usa tu correo institucional terminado en @uamv.edu.ni" required>
+      <label class="form-label mt-3">Entrar como</label><select class="form-select form-select-lg" name="role"><option>Estudiante</option><option>Coordinador</option></select>
+      <button class="btn btn-primary w-100 btn-lg mt-4">Entrar al sistema <span>→</span></button>
+    </form>
+    <div class="login-foot">Seguimiento · Evidencias · Progreso · Reportes</div>
+  </div>
+</div>
+{% endblock %}

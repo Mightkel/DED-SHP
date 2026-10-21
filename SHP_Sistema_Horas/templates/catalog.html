@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Catálogo oficial · SHP{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">ADMINISTRACIÓN · ENTRADA</div><h1>Catálogo oficial</h1><p>Administra las actividades que los estudiantes pueden registrar.</p></div></div>
+<div class="two-column-layout">
+<form method="post" class="form-panel compact-panel"><div class="form-section-title"><span>＋</span><div><h2>Nueva actividad oficial</h2><p>Los elementos activos aparecen en el formulario de registro.</p></div></div><label class="form-label">Nombre *</label><input class="form-control mb-3" name="name" required><label class="form-label">Categoría *</label><input class="form-control mb-3" name="category" placeholder="Académica, Social..." required><label class="form-label">Descripción</label><textarea class="form-control mb-4" name="description" rows="3"></textarea><button class="btn btn-primary w-100">Añadir al catálogo</button></form>
+<div class="table-card"><div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>Actividad</th><th>Categoría</th><th>Estado</th><th></th></tr></thead><tbody>{% for item in items %}<tr><td><b>{{ item['name'] }}</b><small class="d-block text-secondary">{{ item['description'] }}</small></td><td>{{ item['category'] }}</td><td><span class="state {{ 'state-validada' if item['active'] else 'state-rechazada' }}">{{ 'Activa' if item['active'] else 'Inactiva' }}</span></td><td><form method="post" action="{{ url_for('toggle_catalog', item_id=item['id']) }}"><button class="btn btn-sm btn-outline-secondary">{{ 'Desactivar' if item['active'] else 'Activar' }}</button></form></td></tr>{% endfor %}</tbody></table></div></div>
+</div>
+{% endblock %}

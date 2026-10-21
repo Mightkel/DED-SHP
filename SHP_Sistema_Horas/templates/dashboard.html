@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Panel principal · SHP{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">PANEL PRINCIPAL</div><h1>Hola, {{ user['name'].split()[0] }} <span class="wave">✦</span></h1><p>Este es el resumen de tu actividad y progreso en el SHP.</p></div><a href="{{ url_for('new_activity') }}" class="btn btn-primary">＋ Registrar actividad</a></div>
+{% if user['role']=='Coordinador' %}
+<div class="metric-grid">
+  <div class="metric-card"><div class="metric-top"><span>Registros totales</span><span class="metric-icon blue">▤</span></div><div class="metric-value">{{ total_activities }}</div><div class="metric-foot">Actividades en el sistema</div></div>
+  
+  <div class="metric-card"><div class="metric-top"><span>Horas registradas</span><span class="metric-icon green">✓</span></div><div class="metric-value">{{ valid_hours }}</div><div class="metric-foot">Total acumulado</div></div>
+  <div class="metric-card"><div class="metric-top"><span>Actividades oficiales</span><span class="metric-icon violet">◇</span></div><div class="metric-value">{{ catalog_count }}</div><div class="metric-foot">En el catálogo activo</div></div>
+</div>
+<div class="section-heading"><div><h2>Actividad reciente</h2><p>Últimos registros de todos los usuarios</p></div><a href="{{ url_for('history') }}">Ver historial →</a></div>
+{% else %}
+<div class="metric-grid">
+  <div class="metric-card"><div class="metric-top"><span>Horas registradas</span><span class="metric-icon blue">◷</span></div><div class="metric-value">{{ valid_hours }} <small>h</small></div><div class="metric-foot">Horas aprobadas</div></div>
+  
+  <div class="metric-card"><div class="metric-top"><span>Actividades registradas</span><span class="metric-icon green">▤</span></div><div class="metric-value">{{ total_activities }}</div><div class="metric-foot">Total de registros guardados</div></div>
+  <div class="metric-card"><div class="metric-top"><span>Periodo actual</span><span class="metric-icon violet">◫</span></div><div class="metric-value period-value">{{ period }}</div><div class="metric-foot">Meta semestral seleccionada</div></div>
+</div>
+<div class="section-heading"><div><h2>Progreso por categoría</h2><p>Se cuentan todas las horas registradas</p></div><form method="get"><select class="form-select form-select-sm" name="period" onchange="this.form.submit()"><option value="{{ period }}">{{ period }}</option>{% if period.endswith('-I') %}<option value="{{ period[:4] }}-II">{{ period[:4] }}-II</option>{% else %}<option value="{{ period[:4] }}-I">{{ period[:4] }}-I</option>{% endif %}</select></form></div>
+<div class="progress-panel">
+{% if progress %}
+  {% for item in progress %}
+  <div class="progress-item"><div class="progress-label"><div><b>{{ item.category }}</b><small>{{ item.hours }} de {{ item.target }} horas</small></div><strong>{{ item.percent }}%</strong></div><div class="progress track"><div class="progress-bar" style="width: {{ item.percent }}%"></div></div>
+  {% if item.percent < 50 %}<div class="progress-hint warning">Continúa registrando actividades para acercarte a tu meta.</div>{% elif item.percent < 100 %}<div class="progress-hint">Vas avanzando hacia tu objetivo semestral.</div>{% else %}<div class="progress-hint success">¡Meta de esta categoría alcanzada!</div>{% endif %}</div>
+  {% endfor %}
+{% else %}
+<div class="empty-state"><div class="empty-icon">◎</div><h3>Aún no tienes metas configuradas</h3><p>Define tus horas objetivo para comenzar a visualizar el progreso.</p><a href="{{ url_for('goals') }}" class="btn btn-outline-primary">Configurar metas</a></div>
+{% endif %}
+</div>
+<div class="section-heading mt-4"><div><h2>Actividad reciente</h2><p>Últimos registros de actividades</p></div><a href="{{ url_for('history') }}">Ver historial →</a></div>
+{% endif %}
+<div class="table-card"><div class="table-responsive"><table class="table align-middle mb-0"><thead><tr>{% if user['role']=='Coordinador' %}<th>Estudiante</th>{% endif %}<th>Actividad</th><th>Fecha</th><th>Horas</th></tr></thead><tbody>
+{% for a in activities %}<tr>{% if user['role']=='Coordinador' %}<td><b>{{ a['user_name'] }}</b><small class="d-block text-secondary">{{ a['email'] }}</small></td>{% endif %}<td><b>{{ a['activity_name'] }}</b><small class="d-block text-secondary">{{ a['category'] }}</small></td><td>{{ a['activity_date'] }}</td><td>{{ a['hours'] }} h</td></tr>{% else %}<tr><td colspan="5"><div class="empty-row">Todavía no hay actividades registradas.</div></td></tr>{% endfor %}
+</tbody></table></div></div>
+{% endblock %}
