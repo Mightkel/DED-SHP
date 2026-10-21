@@ -11,12 +11,13 @@
 {% if session.get('user_id') %}
 <div class="app-shell">
   <aside class="sidebar">
-    <a class="brand" href="{{ url_for('dashboard') }}"><span class="brand-mark">S</span><span><b>SHP</b><small>Horas Personales</small></span></a>
+    <a class="brand" href="{{ url_for('dashboard') }}"><img class="brand-logo" src="{{ url_for('static', filename='logo.png') }}" alt="Logo Universidad Americana"><span><b>SHP</b><small>Horas Personales</small></span></a>
     <div class="nav-label">MENÚ PRINCIPAL</div>
     <a class="nav-link-custom {% if request.endpoint=='dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}"><span>▦</span> Panel principal</a>
     <a class="nav-link-custom {% if request.endpoint=='new_activity' %}active{% endif %}" href="{{ url_for('new_activity') }}"><span>＋</span> Registrar actividad</a>
     <a class="nav-link-custom {% if request.endpoint=='goals' %}active{% endif %}" href="{{ url_for('goals') }}"><span>◎</span> Mis metas</a>
     <a class="nav-link-custom {% if request.endpoint=='history' %}active{% endif %}" href="{{ url_for('history') }}"><span>◷</span> Historial y reportes</a>
+    <a class="nav-link-custom {% if request.endpoint in ['announcements','delete_announcement'] %}active{% endif %}" href="{{ url_for('announcements') }}"><span>▤</span> Anuncios de actividades</a>
     {% if session.get('display_role') == 'Coordinador' %}
     <a class="nav-link-custom {% if request.endpoint=='catalog' %}active{% endif %}" href="{{ url_for('catalog') }}"><span>⚙</span> Catálogo oficial</a>
     {% endif %}

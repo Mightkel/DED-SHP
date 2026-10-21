@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Anuncios de actividades · SHP{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">COMUNIDAD UNIVERSITARIA</div><h1>Anuncios de actividades</h1><p>Consulta actividades, eventos y avisos publicados para la comunidad.</p></div></div>
+{% if user['role'] == 'Coordinador' %}
+<form method="post" class="form-panel announcement-form mb-4">
+  <div class="form-section-title"><span>＋</span><div><h2>Publicar anuncio</h2><p>Comparte los detalles de una actividad.</p></div></div>
+  <div class="row g-3"><div class="col-md-7"><label class="form-label">Título *</label><input class="form-control" name="title" maxlength="140" required placeholder="Ej. Jornada de voluntariado"></div><div class="col-md-5"><label class="form-label">Fecha de la actividad</label><input class="form-control" type="date" name="activity_date"></div><div class="col-md-5"><label class="form-label">Lugar</label><input class="form-control" name="location" maxlength="160" placeholder="Ej. Campus universitario"></div><div class="col-12"><label class="form-label">Descripción *</label><textarea class="form-control" name="body" rows="3" required placeholder="Información, horario e indicaciones..."></textarea></div><div class="col-12"><button class="btn btn-primary">Publicar anuncio</button></div></div>
+</form>
+{% endif %}
+<div class="announcement-list">
+{% for item in announcements %}<article class="announcement-card"><div class="announcement-date">{% if item['activity_date'] %}<span>{{ item['activity_date'] }}</span>{% else %}<span>AVISO</span>{% endif %}</div><div class="announcement-content"><h2>{{ item['title'] }}</h2><div class="announcement-meta">{% if item['location'] %}<span>⌖ {{ item['location'] }}</span>{% endif %}{% if item['author'] %}<span>Publicado por {{ item['author'] }}</span>{% endif %}</div><p>{{ item['body'] }}</p></div>{% if user['role'] == 'Coordinador' %}<form method="post" action="{{ url_for('delete_announcement', announcement_id=item['id']) }}" onsubmit="return confirm('¿Eliminar este anuncio?')"><button class="btn btn-sm btn-outline-danger">Eliminar</button></form>{% endif %}</article>{% else %}<div class="form-panel empty-state"><div class="empty-icon">▤</div><h3>No hay anuncios publicados</h3><p>Los avisos de actividades aparecerán aquí cuando se publiquen.</p></div>{% endfor %}
+</div>
+{% endblock %}

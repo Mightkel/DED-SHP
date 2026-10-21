@@ -58,6 +58,15 @@ def init_db():
             period TEXT NOT NULL,
             UNIQUE(user_id, category, period)
         );
+        CREATE TABLE IF NOT EXISTS announcements (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            activity_date TEXT DEFAULT '',
+            location TEXT DEFAULT '',
+            body TEXT NOT NULL,
+            created_by INTEGER REFERENCES users(id),
+            created_at TEXT NOT NULL
+        );
         CREATE TABLE IF NOT EXISTS activities (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL REFERENCES users(id),
@@ -256,6 +265,69 @@ def goals():
         categories = db.execute("SELECT DISTINCT category FROM catalog WHERE active=1 ORDER BY category").fetchall()
         all_goals = db.execute("SELECT * FROM goals WHERE user_id=? ORDER BY period DESC, category", (user["id"],)).fetchall()
     return render_template("goals.html", categories=categories, goals=all_goals, period=period_now())
+
+@app.route("/goals/<int:goal_id>/edit", methods=["POST"])
+@login_required
+def edit_goal(goal_id):
+    user = current_user()
+    target = request.form.get("target_hours", type=float)
+    with get_db() as db:
+        goal = db.execute("SELECT * FROM goals WHERE id=? AND user_id=?", (goal_id, user["id"])).fetchone()
+        if not goal:
+            abort(404)
+        if not target or target <= 0:
+            flash("La meta debe ser mayor que cero.", "danger")
+        else:
+            db.execute("UPDATE goals SET target_hours=? WHERE id=?", (target, goal_id))
+            db.commit()
+            flash("Meta actualizada correctamente.", "success")
+    return redirect(url_for("goals"))
+
+@app.route("/goals/<int:goal_id>/delete", methods=["POST"])
+@login_required
+def delete_goal(goal_id):
+    user = current_user()
+    with get_db() as db:
+        db.execute("DELETE FROM goals WHERE id=? AND user_id=?", (goal_id, user["id"]))
+        db.commit()
+    flash("Meta eliminada.", "success")
+    return redirect(url_for("goals"))
+
+@app.route("/announcements", methods=["GET", "POST"])
+@login_required
+def announcements():
+    user = current_user()
+    if request.method == "POST":
+        if user["role"] != "Coordinador":
+            abort(403)
+        title = request.form.get("title", "").strip()
+        activity_date = request.form.get("activity_date", "").strip()
+        location = request.form.get("location", "").strip()
+        body = request.form.get("body", "").strip()
+        if not title or not body:
+            flash("El título y la descripción son obligatorios.", "danger")
+        else:
+            with get_db() as db:
+                db.execute("INSERT INTO announcements(title,activity_date,location,body,created_by,created_at) VALUES(?,?,?,?,?,?)",
+                           (title, activity_date, location, body, user["id"], datetime.now().isoformat(timespec="seconds")))
+                db.commit()
+            flash("Anuncio publicado.", "success")
+        return redirect(url_for("announcements"))
+    with get_db() as db:
+        items = db.execute("""SELECT an.*, u.name AS author FROM announcements an
+                              LEFT JOIN users u ON u.id=an.created_by
+                              ORDER BY CASE WHEN an.activity_date='' THEN 1 ELSE 0 END, an.activity_date, an.created_at DESC""").fetchall()
+    return render_template("announcements.html", announcements=items, user=user)
+
+@app.route("/announcements/<int:announcement_id>/delete", methods=["POST"])
+@login_required
+@coordinator_required
+def delete_announcement(announcement_id):
+    with get_db() as db:
+        db.execute("DELETE FROM announcements WHERE id=?", (announcement_id,))
+        db.commit()
+    flash("Anuncio eliminado.", "success")
+    return redirect(url_for("announcements"))
 
 @app.route("/history")
 @login_required
